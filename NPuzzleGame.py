@@ -3,11 +3,15 @@ import copy
 
 class State:
 
-    def __init__(self, prevBoard,move="Initial"):
+    def __init__(self, prevState,move="Initial"):
+        self.parent = prevState
         if move == "Initial":
-            self.board = prevBoard
+            self.board = prevState
+            self.parent = None
+            self.movement = None
         else:
-            self.board = copy.deepcopy(prevBoard)
+            self.board = copy.deepcopy(prevState.board)
+            self.movement = move
             if move == "Up":
                 self.board.swappUp()
             elif move == "Down":
@@ -23,10 +27,13 @@ class State:
         return self.board.checkState()
 
     def __eq__(self, other):
-        return self.board == other.board
-
+        if type(other) is State:
+            return self.board == other.board
+        else:
+            return False
 class Board:
     def __init__(self, n):
+        self.__moveDirections = {'Up': True, 'Down': True, 'Left': True, 'Right': True}
         self.n_dim = n
         self.boardSize = n * n
         self.array = [None] * n
@@ -39,7 +46,7 @@ class Board:
             return False
         for i in range(0, self.n_dim):
             for j in range(0, self.n_dim):
-                if self.array[i][j] != other[i][j]:
+                if self.array[i][j] != other.array[i][j]:
                     return False
         return True
 
@@ -54,7 +61,7 @@ class Board:
             for i in range(0, self.n_dim):
                 self.array[i] = tilesList[it:it + self.n_dim]
                 it += self.n_dim
-
+            self.checkDirectionsMovement()
             '''
             x = 0
             for i in range(0,self.n_dim):
@@ -68,6 +75,17 @@ class Board:
             print(x)
 
     def checkState(self):
+        isTerminalState = True
+        checkCount = 0
+        for row in self.array:
+            for x in row:
+                if checkCount != x:
+                    isTerminalState = False
+                checkCount += 1
+
+        if isTerminalState:
+            return isTerminalState
+
         checkCount = 1
         for row in self.array:
             for x in row:
@@ -80,11 +98,19 @@ class Board:
         return True
 
     def checkDirectionsMovement(self):
-        moveDirections = {"Up": False, "Down": False, "Left": False, "Right": False}
 
+        if self.blankPosition < self.n_dim:
+            self.__moveDirections['Up'] = False
+        if self.blankPosition >= self.boardSize - self.n_dim:
+            self.__moveDirections['Down'] = False
+        if self.__checkIfRightBorder():
+            self.__moveDirections['Right'] = False
+        if self.__checkIfLeftBorder():
+            self.__moveDirections['Left'] = False
+        return self.__moveDirections
 
     def swappUp(self):
-        if self.blankPosition < self.n_dim:
+        if not self.__moveDirections['Up']:
             print("You can't go up")
             return False
         else:
@@ -108,7 +134,7 @@ class Board:
             return True
 
     def swappDown(self):
-        if self.blankPosition >= self.boardSize - self.n_dim:
+        if not self.__moveDirections['Down']:
             print("You can't go down")
             return False
         else:
@@ -146,18 +172,17 @@ class Board:
         for i in range(0, self.n_dim):
             for j in range(0, self.n_dim):
                 if position == self.blankPosition:
-                    print(self.array[i][self.n_dim-1])
                     if self.array[i][self.n_dim-1] == 0:
                         return True
                 position += 1
         return False
 
     def swappLeft(self):
-        if self.__checkIfLeftBorder():
+        if not self.__moveDirections['Left']:
             print("You can't go Left")
             return False
         else:
-            position=0
+            position = 0
             value = 0
             prevBlankPosition = self.blankPosition
             self.blankPosition -= 1
@@ -177,7 +202,7 @@ class Board:
             return True
 
     def swappRight(self):
-        if self.__checkIfRightBorder():
+        if not self.__moveDirections['Right']:
             print("You can't go Right")
             return False
         else:
