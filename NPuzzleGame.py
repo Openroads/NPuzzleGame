@@ -101,12 +101,20 @@ class Board:
 
         if self.blankPosition < self.n_dim:
             self.__moveDirections['Up'] = False
+        else:
+            self.__moveDirections['Up'] = True
         if self.blankPosition >= self.boardSize - self.n_dim:
             self.__moveDirections['Down'] = False
+        else:
+            self.__moveDirections['Down'] = True
         if self.__checkIfRightBorder():
             self.__moveDirections['Right'] = False
+        else:
+            self.__moveDirections['Right'] = True
         if self.__checkIfLeftBorder():
             self.__moveDirections['Left'] = False
+        else:
+            self.__moveDirections['Left'] = True
         return self.__moveDirections
 
     def swappUp(self):
