@@ -24,13 +24,15 @@ class State:
                 print("It's problem with new state - swapping")
 
     def goalTest(self):
-        return self.board.checkState()
+        return self.board.checkState1() or self.board.checkState2()
 
     def __eq__(self, other):
         if type(other) is State:
             return self.board == other.board
         else:
             return False
+
+
 class Board:
     def __init__(self, n):
         self.__moveDirections = {'Up': True, 'Down': True, 'Left': True, 'Right': True}
@@ -42,9 +44,12 @@ class Board:
             self.array[i] = [-1] * n
 
     def __eq__(self, other):
-        if self.n_dim != other.n_dim:
-            return False
-        for i in range(0, self.n_dim):
+        '''if self.n_dim != other.n_dim:
+            return False'''
+        '''for i in range(0, self.n_dim):
+            if self.array[i] != other.array[i]:
+                return False'''
+        for i in range(0,self.n_dim):
             for j in range(0, self.n_dim):
                 if self.array[i][j] != other.array[i][j]:
                     return False
@@ -74,18 +79,16 @@ class Board:
         for x in self.array:
             print(x)
 
-    def checkState(self):
-        isTerminalState = True
+    def checkState1(self):
         checkCount = 0
-        for row in self.array:
-            for x in row:
-                if checkCount != x:
-                    isTerminalState = False
+        for i in range(0,self.n_dim):
+            for j in range(0,self.n_dim):
+                if checkCount != self.array[i][j]:
+                    return False
                 checkCount += 1
+        return True
 
-        if isTerminalState:
-            return isTerminalState
-
+    def checkState2(self):
         checkCount = 1
         for row in self.array:
             for x in row:
@@ -118,52 +121,52 @@ class Board:
         return self.__moveDirections
 
     def swappUp(self):
-        if not self.__moveDirections['Up']:
+        '''if not self.__moveDirections['Up']:
             print("You can't go up")
             return False
-        else:
-            position = 0
-            value = 0
-            prevBlankPosition = self.blankPosition
-            self.blankPosition -= self.n_dim
-            for i in range(0, self.n_dim):
-                for j in range(0, self.n_dim):
-                    if position == self.blankPosition:
-                        value = self.array[i][j]
-                        self.array[i][j] = 0
-                    position += 1
-            position = 0
+        else:'''
+        position = 0
+        value = 0
+        prevBlankPosition = self.blankPosition
+        self.blankPosition -= self.n_dim
+        for i in range(0, self.n_dim):
+            for j in range(0, self.n_dim):
+                if position == self.blankPosition:
+                    value = self.array[i][j]
+                    self.array[i][j] = 0
+                position += 1
+        position = 0
 
-            for i in range(0, self.n_dim):
-                for j in range(0, self.n_dim):
-                    if position == prevBlankPosition:
-                        self.array[i][j] = value
-                    position += 1
-            return True
+        for i in range(0, self.n_dim):
+            for j in range(0, self.n_dim):
+                if position == prevBlankPosition:
+                    self.array[i][j] = value
+                position += 1
+        return True
 
     def swappDown(self):
-        if not self.__moveDirections['Down']:
+        '''if not self.__moveDirections['Down']:
             print("You can't go down")
             return False
-        else:
-            position = 0
-            value = 0
-            prevBlankPosition = self.blankPosition
-            self.blankPosition += self.n_dim
-            for i in range(0, self.n_dim):
-                for j in range(0, self.n_dim):
-                    if position == self.blankPosition:
-                        value = self.array[i][j]
-                        self.array[i][j] = 0
-                    position += 1
-            position = 0
+        else:'''
+        position = 0
+        value = 0
+        prevBlankPosition = self.blankPosition
+        self.blankPosition += self.n_dim
+        for i in range(0, self.n_dim):
+            for j in range(0, self.n_dim):
+                if position == self.blankPosition:
+                    value = self.array[i][j]
+                    self.array[i][j] = 0
+                position += 1
+        position = 0
 
-            for i in range(0, self.n_dim):
-                for j in range(0, self.n_dim):
-                    if position == prevBlankPosition:
-                        self.array[i][j] = value
-                    position += 1
-            return True
+        for i in range(0, self.n_dim):
+            for j in range(0, self.n_dim):
+                if position == prevBlankPosition:
+                    self.array[i][j] = value
+                position += 1
+        return True
 
     def __checkIfLeftBorder(self):
         position = 0
@@ -186,49 +189,49 @@ class Board:
         return False
 
     def swappLeft(self):
-        if not self.__moveDirections['Left']:
+        '''if not self.__moveDirections['Left']:
             print("You can't go Left")
             return False
-        else:
-            position = 0
-            value = 0
-            prevBlankPosition = self.blankPosition
-            self.blankPosition -= 1
-            for i in range(0, self.n_dim):
-                for j in range(0, self.n_dim):
-                    if position == self.blankPosition:
-                        value = self.array[i][j]
-                        self.array[i][j] = 0
-                    position += 1
-            position = 0
+        else:'''
+        position = 0
+        value = 0
+        prevBlankPosition = self.blankPosition
+        self.blankPosition -= 1
+        for i in range(0, self.n_dim):
+            for j in range(0, self.n_dim):
+                if position == self.blankPosition:
+                    value = self.array[i][j]
+                    self.array[i][j] = 0
+                position += 1
+        position = 0
 
-            for i in range(0, self.n_dim):
-                for j in range(0, self.n_dim):
-                    if position == prevBlankPosition:
-                        self.array[i][j] = value
-                    position += 1
-            return True
+        for i in range(0, self.n_dim):
+            for j in range(0, self.n_dim):
+                if position == prevBlankPosition:
+                    self.array[i][j] = value
+                position += 1
+        return True
 
     def swappRight(self):
-        if not self.__moveDirections['Right']:
+        '''if not self.__moveDirections['Right']:
             print("You can't go Right")
             return False
-        else:
-            position = 0
-            value = 0
-            prevBlankPosition = self.blankPosition
-            self.blankPosition += 1
-            for i in range(0, self.n_dim):
-                for j in range(0, self.n_dim):
-                    if position == self.blankPosition:
-                        value = self.array[i][j]
-                        self.array[i][j] = 0
-                    position += 1
-            position = 0
+        else:'''
+        position = 0
+        value = 0
+        prevBlankPosition = self.blankPosition
+        self.blankPosition += 1
+        for i in range(0, self.n_dim):
+            for j in range(0, self.n_dim):
+                if position == self.blankPosition:
+                    value = self.array[i][j]
+                    self.array[i][j] = 0
+                position += 1
+        position = 0
 
-            for i in range(0, self.n_dim):
-                for j in range(0, self.n_dim):
-                    if position == prevBlankPosition:
-                        self.array[i][j] = value
-                    position += 1
-            return True
+        for i in range(0, self.n_dim):
+            for j in range(0, self.n_dim):
+                if position == prevBlankPosition:
+                    self.array[i][j] = value
+                position += 1
+        return True
