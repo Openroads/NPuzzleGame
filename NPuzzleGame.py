@@ -1,4 +1,3 @@
-import copy
 import math
 
 
@@ -7,11 +6,13 @@ class State:
         self.parent = prevState
         if move == "Initial":
             self.board = prevState
+            self.depth = 0
             self.parent = None
             self.movement = None
         else:
-            self.board = copy.deepcopy(prevState.board)
+            self.board = Board(prevState.board.array[:])
             self.movement = move
+            self.depth = self.parent.depth + 1
             if move == "Up":
                 self.board.swappUp()
             elif move == "Down":
@@ -34,20 +35,24 @@ class State:
 
 
 class Board:
+    leftBorder = []
+    rightBorder = []
+
     def __init__(self, tilesList):
         self.__moveDirections = {'Up': True, 'Down': True, 'Left': True, 'Right': True}
         self.boardSize = len(tilesList)
         self.n_dim = int(math.sqrt(self.boardSize))
         self.array = tilesList
         self.blankPosition = self.array.index(0)
-        self.leftBorder, self.rightBorder = self.__designateBorders()
-        self.__moveDirections = self.checkDirectionsMovement()
 
     def __eq__(self, other):
         return self.array == other.array
 
     def showBoard(self):
-        print(self.array)
+        for x in range(0,self.boardSize):
+            print(self.array[x], end=" ")
+            if x in self.rightBorder:
+                print()
 
     def checkState1(self):
         checkCount = 0
@@ -96,24 +101,22 @@ class Board:
         self.blankPosition += self.n_dim
         self.array[self.blankPosition], self.array[prevBlankPosition] = self.array[prevBlankPosition], self.array[self.blankPosition]
 
-    def __designateBorders(self):
-        listLeft = []
+    def designateBorders(self):
         left = 0
         while left < self.boardSize:
-            listLeft.append(left)
+            Board.leftBorder.append(left)
             left += self.n_dim
-        listRight = []
+
         right = self.n_dim-1
         while right <= self.boardSize:
-            listRight.append(right)
+            Board.rightBorder.append(right)
             right += self.n_dim
-        return listLeft, listRight
 
     def __checkIfLeftBorder(self):
-        return self.blankPosition in self.leftBorder
+        return self.blankPosition in Board.leftBorder
 
     def __checkIfRightBorder(self):
-        return self.blankPosition in self.rightBorder
+        return self.blankPosition in Board.rightBorder
 
     def swappLeft(self):
         prevBlankPosition = self.blankPosition
