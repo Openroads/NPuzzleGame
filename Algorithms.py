@@ -38,7 +38,7 @@ def bfs(board):
             if state.goalTest():
                 fringe_size = length
                 while state != None:
-                    print(state)
+                    #print(state)
                     nodeList.append(state)
                     state = state.parent
                 nodeList.reverse()

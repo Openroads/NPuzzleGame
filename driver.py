@@ -14,9 +14,8 @@ if len(sys.argv) == 1:
         print(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss/1000)
         start = time.time()
 
-        board = Board(int(size))
-        board.setTiles(inputList)
-        path = bfs(board)
+        board = Board(inputList)
+        path = dfs(board)
 
         end = time.time()
         print(end - start)

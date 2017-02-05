@@ -1,8 +1,8 @@
 import copy
+import math
 
 
 class State:
-
     def __init__(self, prevState,move="Initial"):
         self.parent = prevState
         if move == "Initial":
@@ -34,71 +34,37 @@ class State:
 
 
 class Board:
-    def __init__(self, n):
+    def __init__(self, tilesList):
         self.__moveDirections = {'Up': True, 'Down': True, 'Left': True, 'Right': True}
-        self.n_dim = n
-        self.boardSize = n * n
-        self.array = [None] * n
-        self.blankPosition = self.boardSize
-        for i in range(0, n):
-            self.array[i] = [-1] * n
+        self.boardSize = len(tilesList)
+        self.n_dim = int(math.sqrt(self.boardSize))
+        self.array = tilesList
+        self.blankPosition = self.array.index(0)
+        self.leftBorder, self.rightBorder = self.__designateBorders()
+        self.__moveDirections = self.checkDirectionsMovement()
 
     def __eq__(self, other):
-        '''if self.n_dim != other.n_dim:
-            return False'''
-        '''for i in range(0, self.n_dim):
-            if self.array[i] != other.array[i]:
-                return False'''
-        for i in range(0,self.n_dim):
-            for j in range(0, self.n_dim):
-                if self.array[i][j] != other.array[i][j]:
-                    return False
-        return True
-
-    def setTiles(self, tilesList):
-        self.blankPosition = [i for i, x in enumerate(tilesList) if x == 0][0]
-        print(self.blankPosition)
-        if len(tilesList) != self.boardSize:
-            print("Incorrect number of tiles")
-            return False
-        else:
-            it = 0
-            for i in range(0, self.n_dim):
-                self.array[i] = tilesList[it:it + self.n_dim]
-                it += self.n_dim
-            self.checkDirectionsMovement()
-            '''
-            x = 0
-            for i in range(0,self.n_dim):
-                for j in range(0,self.n_dim):
-                    self.array[i][j] = tilesList[x]
-                    x+=1
-            '''
+        return self.array == other.array
 
     def showBoard(self):
-        for x in self.array:
-            print(x)
+        print(self.array)
 
     def checkState1(self):
         checkCount = 0
-        for i in range(0,self.n_dim):
-            for j in range(0,self.n_dim):
-                if checkCount != self.array[i][j]:
+        for x in self.array:
+                if checkCount != x:
                     return False
                 checkCount += 1
         return True
 
     def checkState2(self):
         checkCount = 1
-        for row in self.array:
-            for x in row:
-                if checkCount != x:
-                    if checkCount == self.boardSize and x == 0:
-                        return True
-                    else:
-                        return False
-                checkCount += 1
-        return True
+
+        for x in range(0, self.boardSize-1):
+            if x != checkCount:
+                return False
+        if self.array[self.boardSize-1] == 0:
+            return True
 
     def checkDirectionsMovement(self):
 
@@ -121,117 +87,40 @@ class Board:
         return self.__moveDirections
 
     def swappUp(self):
-        '''if not self.__moveDirections['Up']:
-            print("You can't go up")
-            return False
-        else:'''
-        position = 0
-        value = 0
         prevBlankPosition = self.blankPosition
         self.blankPosition -= self.n_dim
-        for i in range(0, self.n_dim):
-            for j in range(0, self.n_dim):
-                if position == self.blankPosition:
-                    value = self.array[i][j]
-                    self.array[i][j] = 0
-                position += 1
-        position = 0
-
-        for i in range(0, self.n_dim):
-            for j in range(0, self.n_dim):
-                if position == prevBlankPosition:
-                    self.array[i][j] = value
-                position += 1
-        return True
+        self.array[self.blankPosition], self.array[prevBlankPosition] = self.array[prevBlankPosition], self.array[self.blankPosition]
 
     def swappDown(self):
-        '''if not self.__moveDirections['Down']:
-            print("You can't go down")
-            return False
-        else:'''
-        position = 0
-        value = 0
         prevBlankPosition = self.blankPosition
         self.blankPosition += self.n_dim
-        for i in range(0, self.n_dim):
-            for j in range(0, self.n_dim):
-                if position == self.blankPosition:
-                    value = self.array[i][j]
-                    self.array[i][j] = 0
-                position += 1
-        position = 0
+        self.array[self.blankPosition], self.array[prevBlankPosition] = self.array[prevBlankPosition], self.array[self.blankPosition]
 
-        for i in range(0, self.n_dim):
-            for j in range(0, self.n_dim):
-                if position == prevBlankPosition:
-                    self.array[i][j] = value
-                position += 1
-        return True
+    def __designateBorders(self):
+        listLeft = []
+        left = 0
+        while left < self.boardSize:
+            listLeft.append(left)
+            left += self.n_dim
+        listRight = []
+        right = self.n_dim-1
+        while right <= self.boardSize:
+            listRight.append(right)
+            right += self.n_dim
+        return listLeft, listRight
 
     def __checkIfLeftBorder(self):
-        position = 0
-        for i in range(0, self.n_dim):
-            for j in range(0, self.n_dim):
-                if position == self.blankPosition:
-                    if self.array[i][0] == 0:
-                        return True
-                position += 1
-        return False
+        return self.blankPosition in self.leftBorder
 
     def __checkIfRightBorder(self):
-        position = 0
-        for i in range(0, self.n_dim):
-            for j in range(0, self.n_dim):
-                if position == self.blankPosition:
-                    if self.array[i][self.n_dim-1] == 0:
-                        return True
-                position += 1
-        return False
+        return self.blankPosition in self.rightBorder
 
     def swappLeft(self):
-        '''if not self.__moveDirections['Left']:
-            print("You can't go Left")
-            return False
-        else:'''
-        position = 0
-        value = 0
         prevBlankPosition = self.blankPosition
         self.blankPosition -= 1
-        for i in range(0, self.n_dim):
-            for j in range(0, self.n_dim):
-                if position == self.blankPosition:
-                    value = self.array[i][j]
-                    self.array[i][j] = 0
-                position += 1
-        position = 0
-
-        for i in range(0, self.n_dim):
-            for j in range(0, self.n_dim):
-                if position == prevBlankPosition:
-                    self.array[i][j] = value
-                position += 1
-        return True
+        self.array[self.blankPosition], self.array[prevBlankPosition] = self.array[prevBlankPosition], self.array[self.blankPosition]
 
     def swappRight(self):
-        '''if not self.__moveDirections['Right']:
-            print("You can't go Right")
-            return False
-        else:'''
-        position = 0
-        value = 0
         prevBlankPosition = self.blankPosition
         self.blankPosition += 1
-        for i in range(0, self.n_dim):
-            for j in range(0, self.n_dim):
-                if position == self.blankPosition:
-                    value = self.array[i][j]
-                    self.array[i][j] = 0
-                position += 1
-        position = 0
-
-        for i in range(0, self.n_dim):
-            for j in range(0, self.n_dim):
-                if position == prevBlankPosition:
-                    self.array[i][j] = value
-                position += 1
-        return True
+        self.array[self.blankPosition], self.array[prevBlankPosition] = self.array[prevBlankPosition], self.array[self.blankPosition]
