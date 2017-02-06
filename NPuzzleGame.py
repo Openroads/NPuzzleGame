@@ -29,7 +29,7 @@ class State:
 
     def __eq__(self, other):
         if type(other) is State:
-            return self.board == other.board
+            return self.board.array == other.board.array
         else:
             return False
 
@@ -37,19 +37,22 @@ class State:
 class Board:
     leftBorder = []
     rightBorder = []
+    boardSize = 0
+    n_dim = 0
+    element = 0
 
     def __init__(self, tilesList):
         self.__moveDirections = {'Up': True, 'Down': True, 'Left': True, 'Right': True}
-        self.boardSize = len(tilesList)
-        self.n_dim = int(math.sqrt(self.boardSize))
         self.array = tilesList
         self.blankPosition = self.array.index(0)
 
-    def __eq__(self, other):
-        return self.array == other.array
+    @staticmethod
+    def initializeStaticVariables(tilesList):
+        Board.boardSize = len(tilesList)
+        Board.n_dim = int(math.sqrt(Board.boardSize))
 
     def showBoard(self):
-        for x in range(0,self.boardSize):
+        for x in range(0, Board.boardSize):
             print(self.array[x], end=" ")
             if x in self.rightBorder:
                 print()
@@ -91,6 +94,23 @@ class Board:
             self.__moveDirections['Left'] = True
         return self.__moveDirections
 
+    def designateBorders(self):
+        left = 0
+        while left < self.boardSize:
+            Board.leftBorder.append(left)
+            left += self.n_dim
+
+        right = Board.n_dim-1
+        while right <= Board.boardSize:
+            Board.rightBorder.append(right)
+            right += Board.n_dim
+
+    def __checkIfLeftBorder(self):
+        return self.blankPosition in Board.leftBorder
+
+    def __checkIfRightBorder(self):
+        return self.blankPosition in Board.rightBorder
+
     def swappUp(self):
         prevBlankPosition = self.blankPosition
         self.blankPosition -= self.n_dim
@@ -100,23 +120,6 @@ class Board:
         prevBlankPosition = self.blankPosition
         self.blankPosition += self.n_dim
         self.array[self.blankPosition], self.array[prevBlankPosition] = self.array[prevBlankPosition], self.array[self.blankPosition]
-
-    def designateBorders(self):
-        left = 0
-        while left < self.boardSize:
-            Board.leftBorder.append(left)
-            left += self.n_dim
-
-        right = self.n_dim-1
-        while right <= self.boardSize:
-            Board.rightBorder.append(right)
-            right += self.n_dim
-
-    def __checkIfLeftBorder(self):
-        return self.blankPosition in Board.leftBorder
-
-    def __checkIfRightBorder(self):
-        return self.blankPosition in Board.rightBorder
 
     def swappLeft(self):
         prevBlankPosition = self.blankPosition
