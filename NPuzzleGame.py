@@ -25,13 +25,8 @@ class State:
                 print("It's problem with new state - swapping")
 
     def goalTest(self):
-        return self.board.checkState1() or self.board.checkState2()
-
-    def __eq__(self, other):
-        if type(other) is State:
-            return self.board.array == other.board.array
-        else:
-            return False
+        return self.board.checkState1()
+               #or self.board.checkState2()
 
 
 class Board:
